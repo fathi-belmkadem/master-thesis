@@ -1,0 +1,9 @@
+admin
+root
+user
+guest
+Admin
+support
+tech
+operator
+ubnt

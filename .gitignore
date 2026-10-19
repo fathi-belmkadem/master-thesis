@@ -1,0 +1,30 @@
+# === SECRETS / KEYS — never publish ===
+*.key
+private.key
+public.key
+*.conf
+wg*.conf
+*.pem
+.env
+
+# === Captured evidence & generated data ===
+# runs/ holds raw tool output, pcaps, and recovered credentials (result/notes) — do NOT publish
+engagement/runs/
+# assembled dataset outputs (regenerable, can be large)
+engagement/dataset/out/
+# pcap captures
+*.pcap
+*.pcapng
+
+# === Python ===
+__pycache__/
+*.pyc
+*.pyo
+
+# === OS / editor cruft ===
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+.vscode/

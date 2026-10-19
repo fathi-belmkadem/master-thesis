@@ -1,0 +1,41 @@
+device_model,private_ip,wireguard_ip,mac,firmware,device_class
+Shelly Plug S Gen3,10.21.30.39,10.100.101.39,8c:bf:ea:a3:aa:a0,20240820-134301/1.2.3-plugsg3prod0-gec79607,smart_plug
+H6008 E27,10.21.30.33,10.100.101.33,5C:E7:53:6D:9A:06,V1.01.25,smart_bulb
+ZY-M100 Motion Sensor,10.21.30.14,10.100.101.14,4C:A9:19:B3:5D:3F,Main V2.7.7 / MCU V1.0.0,motion_sensor
+Piotek_EspTempsensor,10.21.30.11,10.100.101.11,d4:8c:49:33:2a:d1,V2026.3.1,esp_sensor
+Alantop Smart Desk Lamp RGBCW2,10.21.30.24,10.100.101.24,80:64:7C:D9:91:59,Main V1.0.0 / MCU V2.1.0,smart_bulb
+Tapo P125M Fan Plug,10.21.30.37,10.100.101.37,98:25:4a:cb:ed:96,1.2.3 Build 240617 Rel.153525,smart_plug
+Govee H714E Humidifier,10.21.30.31,10.100.101.31,3C:DC:75:0E:06:94,V1.00.33,appliance
+Tapo L530 light,10.21.30.41,10.100.101.41,e0:d3:62:c0:06:f3,1.1.9 Build 240524 Rel.144922,smart_bulb
+Tapo P125M Plug,10.21.30.38,10.100.101.38,5c:e9:31:c4:73:79,1.2.3 Build 240617 Rel.153525,smart_plug
+PIR Motion Sensor-P01,10.21.30.17,10.100.101.17,F8:17:2D:29:3B:16,Main V2.1.12 / MCU V1.0.0,motion_sensor
+Piotek_EspTempsensor,10.21.30.21,10.100.101.21,40:91:51:68:8c:5e,V2026.3.1,esp_sensor
+Tapo L530 light,10.21.30.34,10.100.101.34,e0:d3:62:bf:f7:a1,1.1.9 Build 240524 Rel.144922,smart_bulb
+Tapo C200,10.21.30.10,10.100.101.10,ec:75:0c:4e:e9:a6,V1.3.3,ip_camera
+TP-L900 Light Strip,10.21.30.26,10.100.101.26,c0:3a:55:4f:1c:d3,V1.1.1 build 240625 Rel.205528,smart_bulb
+PIR Motion Sensor-P01,10.21.30.18,10.100.101.18,F8:17:2D:29:33:B1,Main V2.1.12 / MCU V1.0.0,motion_sensor
+Tapo L530 light,10.21.30.44,10.100.101.44,ac:a7:f1:8c:e6:74,1.1.9 Build 240524 Rel.144922,smart_bulb
+PIR Motion Sensor-P01,10.21.30.9,10.100.101.9,F8:17:2D:29:33:47,Main V2.1.12 / MCU V1.0.0,motion_sensor
+TC70,10.21.30.19,10.100.101.19,8c:86:dd:5f:8c:e2,V1.0.17,ip_camera
+Tapo L530 light,10.21.30.43,10.100.101.43,ac:a7:f1:8c:e4:3d,1.1.9 Build 240524 Rel.144922,smart_bulb
+PIR Motion Sensor-P01,10.21.30.15,10.100.101.15,38:A5:C9:B7:E8:EE,Main V2.1.12 / MCU V1.0.0,motion_sensor
+Shelly2PM Gen4,10.21.30.40,10.100.101.40,cc:ba:97:df:68:88,20260710-101230/2.0.0-g87fbfa4,smart_plug
+Reolink E1,10.21.30.20,10.100.101.20,ec:71:db:fd:6b:6d,V3.1.0.4417_2412122130,ip_camera
+Govee H714E Humidifier,10.21.30.30,10.100.101.30,3C:DC:75:0A:80:54,V1.00.33,appliance
+Tapo L530 light,10.21.30.45,10.100.101.45,ac:a7:f1:8c:e6:36,1.1.9 Build 240524 Rel.144922,smart_bulb
+PIR Motion Sensor-P01,10.21.30.16,10.100.101.16,38:A5:C9:B7:E9:B7,Main V2.1.12 / MCU V1.0.0,motion_sensor
+Alexa Echo Dot Gen 4,10.21.30.28,10.100.101.28,B4:B7:42:56:4A:24,V13222531716,voice_assistant
+Tapo L530 light,10.21.30.42,10.100.101.42,e0:d3:62:c0:15:14,1.1.9 Build 240524 Rel.144922,smart_bulb
+Govee H714E Humidifier,10.21.30.32,10.100.101.32,3C:DC:75:0A:E1:50,V1.00.33,appliance
+Alantop Smart Desk Lamp RGBCW2,10.21.30.25,10.100.101.25,80:64:7C:D9:AF:CF,Main V1.0.0 / MCU V2.1.0,smart_bulb
+Tapo P100 Fan Plug,10.21.30.36,10.100.101.36,b4:b0:24:44:d3:e2,1.5.5 Build 20230927 Rel.40646,smart_plug
+TP P115 Lamp Plug,10.21.30.35,10.100.101.35,6c:4c:bc:d9:64:e9,V1.4.8 Build 260804 Rel.045837,smart_plug
+ZY-M100 Motion Sensor,10.21.30.13,10.100.101.13,38:A5:C9:3D:B4:26,Main V2.7.7 / MCU V1.0.0,motion_sensor
+Piotek_EspTempsensor,10.21.30.23,10.100.101.23,d4:8c:49:33:2a:e7,V2026.3.1,esp_sensor
+TP-L900 Light Strip,10.21.30.27,10.100.101.27,c0:3a:55:3b:5d:54,V1.1.1 build 240625 Rel.205528,smart_bulb
+Amcrest IP2M-841B-V3,10.21.30.12,10.100.101.12,34:46:63:20:49:EF,Web V3.2.1.18144 / ONVIF 21.12,ip_camera
+Amazon FireTv Stick 4K,10.21.30.57,10.100.101.57,54:2B:1C:F1:B0:47,Fire OS 8.1.8.2,media_device
+Reolink D340W,10.21.30.56,10.100.101.56,7C:01:3E:9C:D0:BA,Firmware V3.0.0.0.4662_2508131282,ip_camera
+Meross MSG100,10.21.30.55,10.100.101.55,C4:E7:AE:15:7C:57,V4.2.20,garage_opener
+H5179 Humidity Sensor,10.21.30.54,10.100.101.54,5C:E7:53:18:F0:9A,V1.00.11,sensor
+H5179 Humidity Sensor,10.21.30.53,10.100.101.53,5C:E7:53:16:F8:74,V1.00.11,sensor

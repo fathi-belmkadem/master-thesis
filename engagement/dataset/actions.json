@@ -1,0 +1,53 @@
+{
+  "_comment": "Action space for the autonomous attack-selection agent, derived from the supervisor's catalogue. Each action: session_label (HA marker category), kill-chain phase, MITRE ATT&CK id, tool, script that runs it, preconditions (state predicates that must hold to be a legal action), params, and 'match' substrings used by assemble.py to map a run's cmd.txt back to this action.",
+  "state_predicates": {
+    "host.alive": "target responded to discovery",
+    "host.has_service(X)": "service X (http/https/rtsp/onvif/ssh/telnet/kasa/rpc/37777) seen on target",
+    "host.vuln_known": "at least one vuln enumerated on target",
+    "host.creds_known": "credentials recovered for target",
+    "host.foothold": "code-exec / shell / implant on target",
+    "host.is(MODEL)": "target device_class or model matches",
+    "attacker.on_link": "attacker positioned on the L2 segment (for ARP/DNS MITM)"
+  },
+  "actions": [
+    {"id": "scan.discovery", "session_label": "scan", "phase": "Reconnaissance", "attck": "T1595.001", "tool": "nmap -sn", "script": "02_scan/recon.sh discovery", "preconditions": [], "params": ["subnet"], "match": ["nmap", "-sn"]},
+    {"id": "scan.ports", "session_label": "scan", "phase": "Reconnaissance", "attck": "T1046", "tool": "nmap -sS -sV", "script": "02_scan/recon.sh ports", "preconditions": ["host.alive"], "params": ["target"], "match": ["nmap", "-sV", "-p-"]},
+    {"id": "scan.udp", "session_label": "scan", "phase": "Reconnaissance", "attck": "T1046", "tool": "nmap -sU", "script": "02_scan/recon.sh ports", "preconditions": ["host.alive"], "params": ["target"], "match": ["nmap", "-sU"]},
+    {"id": "scan.fingerprint", "session_label": "scan", "phase": "Reconnaissance", "attck": "T1595", "tool": "nmap -O", "script": "02_scan/recon.sh fingerprint", "preconditions": ["host.alive"], "params": ["target"], "match": ["nmap", "-O"]},
+    {"id": "scan.vuln", "session_label": "scan", "phase": "Reconnaissance", "attck": "T1595.002", "tool": "nmap --script vuln", "script": "02_scan/recon.sh vuln", "preconditions": ["host.has_service(any)"], "params": ["target"], "match": ["nmap", "--script vuln"]},
+
+    {"id": "web.fingerprint", "session_label": "web", "phase": "Reconnaissance", "attck": "T1595.002", "tool": "whatweb", "script": "03_web/web.sh fp", "preconditions": ["host.has_service(http)"], "params": ["target", "port"], "match": ["whatweb"]},
+    {"id": "web.nikto", "session_label": "web", "phase": "Exploitation", "attck": "T1190", "tool": "nikto", "script": "03_web/web.sh nikto", "preconditions": ["host.has_service(http)"], "params": ["target", "port"], "match": ["nikto"]},
+    {"id": "web.sqli", "session_label": "web", "phase": "Exploitation", "attck": "T1190", "tool": "sqlmap", "script": "03_web/web.sh sqlmap", "preconditions": ["host.has_service(http)"], "params": ["url"], "match": ["sqlmap"]},
+    {"id": "web.xss", "session_label": "web", "phase": "Exploitation", "attck": "T1190", "tool": "ZAP/Burp (manual)", "script": "manual", "preconditions": ["host.has_service(http)"], "params": ["url"], "match": ["xss"]},
+    {"id": "web.cmd_injection", "session_label": "web", "phase": "Exploitation", "attck": "T1059", "tool": "Burp/manual", "script": "manual", "preconditions": ["host.has_service(http)"], "params": ["url"], "match": ["cmdinj"]},
+    {"id": "web.shell_upload", "session_label": "web", "phase": "Installation", "attck": "T1505.003", "tool": "Burp/manual", "script": "manual", "preconditions": ["host.has_service(http)"], "params": ["url"], "match": ["webshell"]},
+
+    {"id": "brute.ssh", "session_label": "brute_force", "phase": "Exploitation", "attck": "T1110.001", "tool": "hydra ssh", "script": "04_brute_force/brute.sh ssh", "preconditions": ["host.has_service(ssh)"], "params": ["target"], "match": ["hydra", "ssh://"]},
+    {"id": "brute.telnet", "session_label": "brute_force", "phase": "Exploitation", "attck": "T1110.001", "tool": "hydra telnet", "script": "04_brute_force/brute.sh telnet", "preconditions": ["host.has_service(telnet)"], "params": ["target"], "match": ["hydra", "telnet://"]},
+    {"id": "brute.rtsp", "session_label": "brute_force", "phase": "Exploitation", "attck": "T1110.001", "tool": "hydra rtsp", "script": "04_brute_force/brute.sh rtsp", "preconditions": ["host.has_service(rtsp)"], "params": ["target"], "match": ["hydra", "rtsp://"]},
+    {"id": "brute.http", "session_label": "brute_force", "phase": "Exploitation", "attck": "T1110.001", "tool": "hydra http", "script": "04_brute_force/brute.sh http-get|http-form", "preconditions": ["host.has_service(http)"], "params": ["target", "path|form"], "match": ["hydra", "http"]},
+    {"id": "brute.cred_stuffing", "session_label": "brute_force", "phase": "Exploitation", "attck": "T1110.004", "tool": "hydra (reused creds)", "script": "04_brute_force/brute.sh", "preconditions": ["host.creds_known"], "params": ["target", "service"], "match": ["hydra", "stuff"]},
+
+    {"id": "cve.2026_1871_c200_rtsp", "session_label": "cve_exploit", "phase": "Exploitation", "attck": "T1190,T1499", "tool": "Metasploit/PoC", "script": "05_cve_exploit (tbd)", "preconditions": ["host.is(Tapo C200)", "host.has_service(rtsp)"], "params": ["target"], "match": ["2026-1871", "c200"]},
+    {"id": "cve.2020_5735_amcrest", "session_label": "cve_exploit", "phase": "Exploitation", "attck": "T1190", "tool": "Metasploit/PoC", "script": "05_cve_exploit (tbd)", "preconditions": ["host.is(Amcrest)", "host.has_service(37777)"], "params": ["target"], "match": ["2020-5735", "amcrest", "37777"]},
+    {"id": "cve.2023_38907_l530_replay", "session_label": "cve_exploit", "phase": "Exploitation", "attck": "T1212,T1557", "tool": "bettercap+replay", "script": "05_cve_exploit (tbd)", "preconditions": ["host.is(Tapo L530)", "attacker.on_link"], "params": ["target"], "match": ["2023-38907", "l530"]},
+    {"id": "cve.2021_35067_meross_replay", "session_label": "cve_exploit", "phase": "Exploitation", "attck": "T1557", "tool": "bettercap+replay", "script": "05_cve_exploit (tbd)", "preconditions": ["host.is(Meross MSG100)", "attacker.on_link"], "params": ["target"], "match": ["2021-35067", "meross"]},
+
+    {"id": "c2.beacon", "session_label": "c2", "phase": "Command and Control", "attck": "T1071,T1571", "tool": "Sliver/Covenant/scripted", "script": "06_c2 (tbd)", "preconditions": ["host.foothold"], "params": ["target"], "match": ["beacon", "sliver", "covenant"]},
+
+    {"id": "dos.syn_flood", "session_label": "dos", "phase": "Actions on Objectives", "attck": "T1498.001", "tool": "hping3 SYN", "script": "07_dos_ddos (tbd)", "preconditions": ["host.alive"], "params": ["target"], "match": ["hping3", "-S"]},
+    {"id": "dos.udp_flood", "session_label": "dos", "phase": "Actions on Objectives", "attck": "T1498.001", "tool": "hping3 UDP", "script": "07_dos_ddos (tbd)", "preconditions": ["host.alive"], "params": ["target"], "match": ["hping3", "--udp"]},
+    {"id": "dos.icmp_flood", "session_label": "dos", "phase": "Actions on Objectives", "attck": "T1498.001", "tool": "hping3 ICMP", "script": "07_dos_ddos (tbd)", "preconditions": ["host.alive"], "params": ["target"], "match": ["hping3", "--icmp"]},
+    {"id": "dos.http_exhaust", "session_label": "dos", "phase": "Actions on Objectives", "attck": "T1499", "tool": "slowhttptest/httpflood", "script": "07_dos_ddos (tbd)", "preconditions": ["host.has_service(http)"], "params": ["target"], "match": ["slowhttptest", "httpflood", "slowloris"]},
+
+    {"id": "exfil.scp", "session_label": "exfil", "phase": "Actions on Objectives", "attck": "T1041", "tool": "scp/curl", "script": "08_exfil (tbd)", "preconditions": ["host.foothold"], "params": ["target"], "match": ["scp", "curl"]},
+    {"id": "exfil.dns_tunnel", "session_label": "exfil", "phase": "Actions on Objectives", "attck": "T1048", "tool": "iodine", "script": "08_exfil (tbd)", "preconditions": ["host.foothold"], "params": ["target"], "match": ["iodine"]},
+
+    {"id": "mitm.arp_sniff", "session_label": "mitm", "phase": "Delivery", "attck": "T1557.002,T1040", "tool": "ettercap/bettercap", "script": "09_mitm (tbd)", "preconditions": ["attacker.on_link"], "params": ["target"], "match": ["ettercap", "bettercap", "arp"]},
+    {"id": "mitm.dns_spoof", "session_label": "mitm", "phase": "Delivery", "attck": "T1557", "tool": "ettercap/bettercap", "script": "09_mitm (tbd)", "preconditions": ["attacker.on_link"], "params": ["target"], "match": ["dns.spoof", "dns_spoof", "dnsspoof"]},
+
+    {"id": "lateral.pivot", "session_label": "lateral", "phase": "Lateral Movement", "attck": "T1210,T1021", "tool": "Metasploit pivot/manual", "script": "10_lateral (tbd)", "preconditions": ["host.foothold"], "params": ["from", "to"], "match": ["pivot", "route add"]},
+    {"id": "lateral.internal_recon", "session_label": "lateral", "phase": "Lateral Movement", "attck": "T1046", "tool": "nmap from pivot", "script": "10_lateral (tbd)", "preconditions": ["host.foothold"], "params": ["from"], "match": ["pivot", "nmap"]}
+  ]
+}

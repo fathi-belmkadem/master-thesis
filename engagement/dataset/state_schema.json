@@ -1,0 +1,37 @@
+{
+  "_comment": "Observation/state model for the agent. The state is the attacker's accumulating knowledge, rebuilt step-by-step by assemble.py from action outcomes. This file documents the shape; it is not loaded at runtime.",
+  "global": {
+    "episode": "string — episode id",
+    "step": "int — index within the episode",
+    "phase_reached": "enum — furthest kill-chain phase reached this episode (Reconnaissance < Delivery < Exploitation < Installation < CommandAndControl < ActionsOnObjectives)",
+    "attacker_on_link": "bool — attacker positioned on the L2 segment (enables ARP/DNS MITM)"
+  },
+  "per_target": {
+    "_keyed_by": "wireguard_ip (10.100.101.X)",
+    "fields": {
+      "ip": "string",
+      "device_class": "string — from 00_scope/targets.csv (ip_camera/smart_plug/...)",
+      "model": "string — from targets.csv",
+      "alive": "bool",
+      "ports": "list[int] — open TCP/UDP ports found",
+      "services": "map[int->string] — port -> service/version string",
+      "firmware": "string — if fingerprinted",
+      "vulns": "list[string] — vuln ids / CVEs enumerated",
+      "creds": "list[{service, user, secret_ref}] — recovered creds (secret stored only in run folder, referenced here)",
+      "foothold": "bool — shell/implant/code-exec achieved",
+      "phase_reached": "enum — furthest phase reached against THIS target"
+    }
+  },
+  "outcome_effects": {
+    "_comment": "How a successful action updates state (assemble.py applies these to build state_before/state_after).",
+    "scan.discovery": "sets alive=true for responding hosts",
+    "scan.ports|scan.udp": "fills ports + services",
+    "scan.fingerprint": "fills firmware",
+    "scan.vuln|web.nikto": "appends vulns",
+    "brute.*": "appends creds; sets creds_known",
+    "cve.*|web.shell_upload": "sets foothold=true (if success)",
+    "c2.beacon": "confirms C2 over foothold",
+    "mitm.*": "requires attacker_on_link; yields sniffed creds/telemetry",
+    "lateral.pivot": "propagates attacker reachability to 'to' target"
+  }
+}
