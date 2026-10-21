@@ -105,3 +105,61 @@ that first. **Additionally capture, synchronized by the same markers:**
 
 Recommendation: **traces + pcap now; add HA telemetry once you have API access.** Start network capture
 before an episode, stop it after, and keep the pcap in the episode's run folders.
+
+---
+
+## Expanded CVE Coverage (9 CVEs → 31 actions)
+
+The action space has grown from the original 4 CVEs to 9 CVEs covering 7 device types.
+The full list is in [`actions.json`](actions.json). New actions added:
+
+| Action ID | CVE | Device | Session label |
+|---|---|---|---|
+| `cve.2020_5736_amcrest_npd` | CVE-2020-5736 | Amcrest `.12` | `cve_exploit` |
+| `cve.2025_14300_c200_connectap` | CVE-2025-14300 | Tapo C200 `.10` | `cve_exploit` |
+| `cve.2021_4045_c200_uhttpd` | CVE-2021-4045 | Tapo C200 `.10` | `cve_exploit` |
+| `cve.2025_55637_reolink_ddns` | CVE-2025-55637 | Reolink D340W `.56` | `cve_exploit` |
+| `cve.2026_64823_ha_shelly_xss` | CVE-2026-64823 | Shelly → HA | `cve_exploit` |
+
+### Preconditions and state machine
+
+Some actions have **version-gates**: `assemble.py` will record the step regardless of the gate
+outcome, but the `result` label should reflect whether the exploit was actually attempted:
+- `fail` — version gate blocked the exploit (firmware appears patched)
+- `partial` — version gate passed but exploit produced no observable effect
+- `success` — exploit confirmed (device crashed, state changed, etc.)
+- `wedged` — device became unresponsive in an unexpected way
+
+### Campaign strategy for best dataset quality
+
+To produce the richest imitation-learning dataset, run **complete end-to-end campaigns**
+per target device (not individual phases in isolation):
+
+```bash
+. ./lib.sh
+episode_start c200_full_campaign
+./capture.sh start c200_full_campaign
+
+./02_scan/recon.sh all 10.100.101.10          # recon
+./03_web/web.sh survey 10.100.101.10          # web fingerprint
+./04_brute_force/brute.sh rtsp 10.100.101.10  # brute force
+./05_cve_exploit/exploit.sh c200-connectap 10.100.101.10  # CVE probe
+./05_cve_exploit/exploit.sh c200 10.100.101.10            # CVE exploit (LAST)
+
+./capture.sh stop  c200_full_campaign
+episode_stop  c200_full_campaign
+
+# Label outcomes:
+echo success > runs/cve_exploit/<ts>_10.100.101.10/result
+
+# Assemble:
+./dataset/assemble.sh
+```
+
+Each device class should have at least one complete campaign. Priority order (richest → simplest):
+1. Tapo C200 (3 CVEs + scan + web + brute)
+2. Amcrest IP2M-841B-V3 (2 CVEs + ONVIF + brute)
+3. Tapo L530 any one unit (1 confirmed CVE + MITM dependency)
+4. Reolink D340W (probe CVE + scan)
+5. Shelly + HA (XSS CVE + web)
+6. Meross MSG100 (version-gated CVE + MITM)

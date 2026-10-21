@@ -1,93 +1,129 @@
-# Master Thesis
+# Master Thesis — IoT Security Testbed Attack Simulation & Autonomous Agent Dataset
 
+**Author:** Fathi Belmkadem  
+**University:** University of Passau  
+**Programme:** Master of Science in Artificial Intelligence  
+**Supervisor:** [Professor name]  
+**Date:** October 2026
 
+---
 
-## Getting started
+## Project Overview
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+This repository contains the complete, reproducible implementation of the thesis's
+two interlinked objectives:
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+### Objective 1 — Attack Simulation (engagement/)
 
-## Add your files
+Reproduce a structured set of real-world IoT attack scenarios against an **institutionally
+approved, isolated lab testbed** (40 devices, WireGuard VPN access only). Every attack
+is documented with exact commands, raw tool output, timestamps, and ATT&CK IDs so each
+scenario can be cited directly in the thesis and reproduced by any examiner with access
+to the lab.
 
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+**9 CVEs** across 7 device types are implemented, ranging from unauthenticated buffer
+overflows and session-replay flaws to command injection and XSS in management software.
+
+### Objective 2 — Autonomous Agent Dataset (engagement/dataset/)
+
+The attack runs double as **labeled training data** for an autonomous attack-selection
+agent. Each run produces a `(state_before → action → outcome → state_after)` step that
+is assembled into an imitation-learning trajectory. The agent learns to select the next
+attack given the current knowledge state, following the kill-chain.
+
+---
+
+## Repository Structure
 
 ```
-cd existing_repo
-git remote add origin https://git.fim.uni-passau.de/belmkadem/master-thesis.git
-git branch -M main
-git push -uf origin main
+Master thesis/
+│
+├── README.md                      ← this file (project overview for the professor)
+├── .gitignore                     ← excludes keys, configs, evidence, pcaps
+│
+└── engagement/                    ← all operational scripts and documentation
+    ├── README.md                  ← engagement workspace guide (start here)
+    ├── lib.sh                     ← shared scope guard + markers + episode helpers
+    ├── capture.sh                 ← optional tunnel pcap
+    │
+    ├── 00_scope/                  ← authorization, device inventory, methodology
+    ├── 01_setup/                  ← Kali setup guide + preflight check script
+    ├── 02_scan/                   ← reconnaissance (nmap)
+    ├── 03_web/                    ← web attack surface (nikto, sqlmap, whatweb)
+    ├── 04_brute_force/            ← credential attacks (hydra)
+    ├── 05_cve_exploit/            ← 9 CVEs: exploit scripts + research matrix
+    ├── 06_c2/                     ← command & control (Sliver)
+    ├── 07_dos_ddos/               ← denial of service (hping3, slowhttptest)
+    ├── 08_exfil/                  ← exfiltration (SCP, iodine DNS tunnel)
+    ├── 09_mitm/                   ← man-in-the-middle (bettercap)
+    ├── 10_lateral/                ← lateral movement (Metasploit, proxychains)
+    ├── wordlists/                 ← seed credential lists
+    └── dataset/                   ← agent training dataset pipeline
 ```
 
-## Integrate with your tools
+> `engagement/runs/` (generated evidence) is gitignored and lives only on the attack host.
 
-* [Set up project integrations](https://git.fim.uni-passau.de/belmkadem/master-thesis/-/settings/integrations)
+---
 
-## Collaborate with your team
+## Testbed Summary
 
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+| Item | Detail |
+|------|--------|
+| Lab devices | 40 IoT devices (cameras, bulbs, plugs, sensors, voice assistant, garage opener) |
+| Access method | WireGuard VPN tunnel — attack host at `10.100.101.60`, devices at `10.100.101.X` |
+| Authorization | Institutionally approved, isolated testbed — author's own devices |
+| Third-party targeting | **None** |
+| Self-propagating malware | **None** |
 
-## Test and Deploy
+---
 
-Use the built-in continuous integration in GitLab.
+## CVE Coverage (9 CVEs)
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
+| CVE | Device | Type | Script |
+|-----|--------|------|--------|
+| CVE-2026-1871 | Tapo C200 | RTSP Authorization header overflow → DoS | `exploit.sh c200` |
+| CVE-2021-4045 | Tapo C200 | uhttpd unauthenticated RCE | `exploit.sh c200-uhttpd` |
+| CVE-2025-14300 | Tapo C200 | Unauthenticated connectAP interface | `exploit.sh c200-connectap` |
+| CVE-2020-5735 | Amcrest IP2M-841B-V3 | Authenticated DHIP stack overflow → DoS/RCE | `exploit.sh amcrest` |
+| CVE-2020-5736 | Amcrest IP2M-841B-V3 | Authenticated DHIP null-pointer dereference → DoS | `exploit.sh amcrest-npd` |
+| CVE-2023-38907 | Tapo L530 (×6) | Session-nonce replay → unauthorized control | `exploit.sh l530` |
+| CVE-2021-35067 | Meross MSG100 | HTTP session replay → garage door actuation | `exploit.sh meross` |
+| CVE-2025-55637 | Reolink D340W | DDNS command injection | `exploit.sh reolink-ddns` |
+| CVE-2026-64823 | Shelly → Home Assistant | XSS via Shelly thumb URI | `ha_xss.sh poc` |
 
-***
+---
 
-# Editing this README
+## Agent Formulation (Dataset Objective)
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+The training dataset represents the attacker's decision problem as a Markov Decision Process:
 
-## Suggestions for a good README
+- **State**: the attacker's current knowledge about each device (alive?, open ports, services,
+  firmware version, discovered vulns, recovered credentials, foothold established, phase reached)
+- **Action**: one of the catalogue techniques (scan, web, brute_force, cve_exploit, c2, dos,
+  exfil, mitm, lateral) with its parameters
+- **Reward**: shaped on kill-chain progress (advancing to a later phase = positive reward;
+  crashing a device needed for later phases = negative reward)
+- **Learning**: imitation learning (behaviour cloning) from expert demonstration trajectories,
+  with optional RL fine-tuning in the isolated lab
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+See `engagement/dataset/DATASET.md` for the full formulation, state schema, and action space.
 
-## Name
-Choose a self-explaining name for your project.
+---
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+## How to Use This Repository
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+1. **Read the authorization and scope documents first**: `engagement/00_scope/scope.md`
+2. **Set up the Kali attack host**: follow `engagement/01_setup/attack-host-setup.md`
+3. **Run the preflight check**: `./engagement/01_setup/preflight.sh`
+4. **Follow the engagement README**: `engagement/README.md` has the complete step-by-step guide
+5. **After each session, assemble the dataset**: `./engagement/dataset/assemble.sh`
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+---
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+## Security and Privacy
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+- All evidence (`runs/`), WireGuard keys (`*.key`, `*.conf`), and pcap files are **gitignored**
+  and never leave the attack host.
+- Recovered credentials are stored only in `runs/` (gitignored).
+- This repository contains **no exploit payloads** — only the scripts that orchestrate
+  standard Kali tools and the PoC helpers that are created at runtime inside `runs/`.
