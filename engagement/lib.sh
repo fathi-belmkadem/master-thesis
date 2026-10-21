@@ -6,7 +6,11 @@ set -euo pipefail
 
 # --- paths -------------------------------------------------------------------
 ENG_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-RUNS_DIR="${ENG_ROOT}/runs"
+# RUNS_DIR can be overridden via env var so evidence can live on a local writable
+# path when the engagement root is a read-only network mount (e.g. CIFS from Windows).
+# Default: <engagement_root>/runs
+# Override: export RUNS_DIR=~/engagement-runs   (then source lib.sh)
+RUNS_DIR="${RUNS_DIR:-${ENG_ROOT}/runs}"
 MARKERS="${RUNS_DIR}/markers.log"
 TARGETS_CSV="${ENG_ROOT}/00_scope/targets.csv"
 
