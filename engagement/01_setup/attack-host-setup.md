@@ -78,6 +78,6 @@ per their upstream instructions **inside the lab host only**. Kali ships most of
 ## 4. Sanity check before scanning
 
 ```bash
-cd /path/to/engagement
+cd /mnt/master-thesis/engagement
 ./01_setup/preflight.sh     # checks tunnel is up, gateway reachable, required tools present
 ```

@@ -21,7 +21,8 @@ do_discovery() {
   local dir; dir=$(new_run "$LABEL" "subnet")
   local cmd="sudo nmap -sn ${NMAP_TIMING} ${SCOPE_CIDR_PREFIX}0/24 --exclude ${GATEWAY} -oA ${dir}/discovery"
   save_cmd "$dir" "$cmd"; echo "+ $cmd"
-  eval "$cmd" | tee "$dir/stdout.txt"
+  sudo nmap -sn ${NMAP_TIMING} "${SCOPE_CIDR_PREFIX}0/24" --exclude "${GATEWAY}" \
+    -oA "${dir}/discovery" | tee "${dir}/stdout.txt"
   end_run "$LABEL" "subnet"
   echo ">> evidence: $dir"
 }
@@ -30,11 +31,10 @@ do_ports() {
   require_scope "$@"
   for ip in "$@"; do
     local dir; dir=$(new_run "$LABEL" "$ip")
-    # full TCP range + top UDP; service/version detection
-    local cmd="sudo nmap -sS -sV -p- ${NMAP_TIMING} ${ip} -oA ${dir}/tcp_ports; sudo nmap -sU --top-ports 50 ${NMAP_TIMING} ${ip} -oA ${dir}/udp_ports"
+    local cmd="sudo nmap -sS -sV -p- ${NMAP_TIMING} ${ip} -oA ${dir}/tcp_ports && sudo nmap -sU --top-ports 50 ${NMAP_TIMING} ${ip} -oA ${dir}/udp_ports"
     save_cmd "$dir" "$cmd"; echo "+ $cmd"
-    sudo nmap -sS -sV -p- ${NMAP_TIMING} "$ip" -oA "$dir/tcp_ports" | tee "$dir/stdout.txt"
-    sudo nmap -sU --top-ports 50 ${NMAP_TIMING} "$ip" -oA "$dir/udp_ports" | tee -a "$dir/stdout.txt"
+    sudo nmap -sS -sV -p- ${NMAP_TIMING} "$ip" -oA "${dir}/tcp_ports" | tee "${dir}/stdout.txt"
+    sudo nmap -sU --top-ports 50 ${NMAP_TIMING} "$ip" -oA "${dir}/udp_ports" | tee -a "${dir}/stdout.txt"
     end_run "$LABEL" "$ip"; echo ">> evidence: $dir"
   done
 }
@@ -45,7 +45,7 @@ do_fingerprint() {
     local dir; dir=$(new_run "$LABEL" "$ip")
     local cmd="sudo nmap -O --osscan-guess ${NMAP_TIMING} ${ip} -oA ${dir}/osfp"
     save_cmd "$dir" "$cmd"; echo "+ $cmd"
-    eval "$cmd" | tee "$dir/stdout.txt"
+    sudo nmap -O --osscan-guess ${NMAP_TIMING} "$ip" -oA "${dir}/osfp" | tee "${dir}/stdout.txt"
     end_run "$LABEL" "$ip"; echo ">> evidence: $dir"
   done
 }
@@ -56,7 +56,7 @@ do_vuln() {
     local dir; dir=$(new_run "$LABEL" "$ip")
     local cmd="sudo nmap -sV --script vuln ${NMAP_TIMING} ${ip} -oA ${dir}/vuln"
     save_cmd "$dir" "$cmd"; echo "+ $cmd"
-    eval "$cmd" | tee "$dir/stdout.txt"
+    sudo nmap -sV --script vuln ${NMAP_TIMING} "$ip" -oA "${dir}/vuln" | tee "${dir}/stdout.txt"
     end_run "$LABEL" "$ip"; echo ">> evidence: $dir"
   done
 }

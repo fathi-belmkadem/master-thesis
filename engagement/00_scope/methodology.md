@@ -18,12 +18,17 @@ Work one kill-chain phase at a time so the thesis can report findings phase-by-p
 
 ## Named CVEs in scope (cve_exploit)
 
-| CVE | Target device(s) | Effect | Tool |
-|-----|------------------|--------|------|
-| CVE-2026-1871 | Tapo C200 (`.10`) | RTSP auth buffer overflow → DoS | Metasploit / custom PoC |
-| CVE-2020-5735 | Amcrest IP2M-841B (`.12`) | port 37777 buffer overflow → DoS/RCE | Metasploit / custom PoC |
-| CVE-2023-38907 | Tapo L530E (all L530) | session-message replay | bettercap + replay |
-| CVE-2021-35067 | Meross MSG100 (`.55`) | capture-replay auth bypass → actuate | bettercap + replay |
+| CVE | Target device(s) | Effect | Script |
+|-----|------------------|--------|--------|
+| CVE-2026-1871 | Tapo C200 (`.10`) | RTSP Authorization header overflow → DoS | `exploit.sh c200` |
+| CVE-2021-4045 | Tapo C200 (`.10`) | uhttpd unauthenticated RCE | `exploit.sh c200-uhttpd` |
+| CVE-2025-14300 | Tapo C200 (`.10`) | Unauthenticated connectAP endpoint | `exploit.sh c200-connectap` |
+| CVE-2020-5735 | Amcrest IP2M-841B (`.12`) | DHIP authenticated stack overflow → DoS/RCE | `exploit.sh amcrest` |
+| CVE-2020-5736 | Amcrest IP2M-841B (`.12`) | DHIP authenticated null-pointer dereference → DoS | `exploit.sh amcrest-npd` |
+| CVE-2023-38907 | Tapo L530 (`.34/.41-.45`) | Session-nonce replay → unauthorized control | `exploit.sh l530` |
+| CVE-2021-35067 | Meross MSG100 (`.55`) | HTTP capture-replay → garage-door actuation | `exploit.sh meross` |
+| CVE-2025-55637 | Reolink D340W (`.56`) | DDNS command injection | `exploit.sh reolink-ddns` |
+| CVE-2026-64823 | Shelly → Home Assistant (`.39/.40`) | XSS via Shelly thumb URI in HA integration | `ha_xss.sh poc` |
 
 ## Evidence convention (thesis-grade reproducibility)
 
