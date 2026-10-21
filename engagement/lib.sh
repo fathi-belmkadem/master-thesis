@@ -40,13 +40,15 @@ require_scope() {
 ts()      { date -u +%Y-%m-%dT%H:%M:%SZ; }
 tsfile()  { date -u +%Y%m%d-%H%M%SZ; }
 
-# new_run <label> <target> -> echoes the run folder, writes START marker
+# new_run <label> <target> -> echoes the run folder path (only), writes START marker
+# IMPORTANT: marker line goes to stderr so callers using dir=$(new_run ...) capture
+# only the path, not the marker text.
 new_run() {
   local label="$1" target="${2:-all}"
   local dir="${RUNS_DIR}/${label}/$(tsfile)_${target//[^0-9A-Za-z._-]/_}"
   mkdir -p "$dir"
   mkdir -p "$(dirname "$MARKERS")"
-  echo "START ${label} ${target} $(ts)" | tee -a "$MARKERS"
+  echo "START ${label} ${target} $(ts)" | tee -a "$MARKERS" >&2
   echo "$dir"
 }
 
