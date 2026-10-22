@@ -13,6 +13,7 @@ ENG_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RUNS_DIR="${RUNS_DIR:-${ENG_ROOT}/runs}"
 MARKERS="${RUNS_DIR}/markers.log"
 TARGETS_CSV="${ENG_ROOT}/00_scope/targets.csv"
+TARGETS_TXT="${ENG_ROOT}/00_scope/targets.txt"   # professor's format: one IP per line, # comments
 
 # --- scope -------------------------------------------------------------------
 # Only addresses in the target subnet are ever allowed to be touched.
@@ -61,8 +62,31 @@ end_run() {
 # save_cmd <run_dir> <command string>  -> records the exact command for reproducibility
 save_cmd() { echo "$2" > "$1/cmd.txt"; }
 
-# live targets from the inventory (wireguard column)
-scope_ips() { tail -n +2 "$TARGETS_CSV" | cut -d, -f3; }
+# live targets — reads targets.txt (professor format) when present, else falls back to targets.csv
+# Strips comment lines and inline comments; skips the Panda-Pivot (.4) which is a foothold host.
+scope_ips() {
+  if [[ -f "$TARGETS_TXT" ]]; then
+    awk 'NF && $1 !~ /^#/ {print $1}' "$TARGETS_TXT" | grep -v '^10\.100\.101\.4$'
+  else
+    tail -n +2 "$TARGETS_CSV" | cut -d, -f3
+  fi
+}
+
+# Raw IP list including the Panda-Pivot foothold (for lateral movement phase only)
+scope_ips_all() {
+  if [[ -f "$TARGETS_TXT" ]]; then
+    awk 'NF && $1 !~ /^#/ {print $1}' "$TARGETS_TXT"
+  else
+    tail -n +2 "$TARGETS_CSV" | cut -d, -f3
+  fi
+}
+
+# Write a temp file of IPs for tools that need -iL (masscan)
+targets_file() {
+  local tmp; tmp=$(mktemp)
+  scope_ips > "$tmp"
+  echo "$tmp"
+}
 
 # --- episodes (dataset grouping) --------------------------------------------
 # An episode brackets one campaign so assemble.py can group its steps into a trajectory.

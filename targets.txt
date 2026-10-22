@@ -1,0 +1,61 @@
+# ForDaySec testbed — scan targets (WireGuard overlay 10.100.101.x)
+# ----------------------------------------------------------------------
+# HOW TO USE:
+#   - One device per line:   <IP>   # <device name>
+#   - To SKIP a device, put a '#' at the very start of its line.
+#   - Blank lines and comment lines are ignored by the scan command below.
+#
+# RUN (strips comments automatically, so both whole-line and trailing
+# '# comment' are fine):
+#   masscan -iL <(awk 'NF && $1 !~ /^#/ {print $1}' ~/fordaysec/targets.txt) \
+#           -p1-65535 -e fordaysec --rate 1000 --wait 10 \
+#           -oL ~/fordaysec/results/masscan-selected.txt
+# ----------------------------------------------------------------------
+
+10.100.101.4    # Panda-Pivot (compromised host / foothold)
+10.100.101.9    # PIR Motion Sensor-P01
+10.100.101.10   # Tapo C200 (camera)
+10.100.101.11   # Piotek_EspTempsensor
+10.100.101.12   # Amcrest IP2M-841B-V3 (camera)
+10.100.101.13   # ZY-M100 Motion Sensor
+10.100.101.14   # ZY-M100 Motion Sensor
+10.100.101.15   # PIR Motion Sensor-P01
+10.100.101.16   # PIR Motion Sensor-P01
+10.100.101.17   # PIR Motion Sensor-P01
+10.100.101.18   # PIR Motion Sensor-P01
+10.100.101.19   # TC70 (camera)
+10.100.101.20   # Reolink E1 (camera)
+10.100.101.21   # Piotek_EspTempsensor
+10.100.101.23   # Piotek_EspTempsensor
+10.100.101.24   # Alantop Smart Desk Lamp RGBCW2
+10.100.101.25   # Alantop Smart Desk Lamp RGBCW2
+10.100.101.26   # TP-L900 Light Strip
+10.100.101.27   # TP-L900 Light Strip
+10.100.101.28   # Alexa Echo Dot Gen 4
+10.100.101.30   # Govee H714E Humidifier
+10.100.101.31   # Govee H714E Humidifier
+10.100.101.32   # Govee H714E Humidifier
+10.100.101.33   # H6008 E27 (bulb)
+10.100.101.34   # Tapo L530 light
+10.100.101.35   # TP P115 Lamp Plug
+10.100.101.36   # Tapo P100 Fan Plug
+10.100.101.37   # Tapo P125M Fan Plug
+10.100.101.38   # Tapo P125M Plug
+10.100.101.39   # Shelly Plug S Gen3
+10.100.101.40   # Shelly2PM Gen4
+10.100.101.41   # Tapo L530 light
+10.100.101.42   # Tapo L530 light
+10.100.101.43   # Tapo L530 light
+10.100.101.44   # Tapo L530 light
+10.100.101.45   # Tapo L530 light
+10.100.101.47   # HBN Plug
+10.100.101.48   # HBN Plug
+10.100.101.49   # Beok TOL47 Thermostat
+10.100.101.50   # SwitchBot Water Leak Detector
+10.100.101.51   # Sonoff DW2
+10.100.101.52   # H5179 Humidity Sensor
+10.100.101.53   # H5179 Humidity Sensor
+10.100.101.54   # H5179 Humidity Sensor
+10.100.101.55   # Meross MSG100 (garage opener)
+10.100.101.56   # Reolink D340W (doorbell)
+10.100.101.57   # Amazon FireTV Stick 4K
