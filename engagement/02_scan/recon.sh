@@ -53,8 +53,10 @@ do_masscan() {
   echo "[*] Rate: 1000 pps on interface $IFACE (--wait 10 for straggler responses)"
   local cmd="sudo masscan -iL ${tfile} -p1-65535 -e ${IFACE} --rate 1000 --wait 10 -oL ${dir}/masscan.txt"
   save_cmd "$dir" "$cmd"; echo "+ $cmd"
+  # No -oL: let masscan print open ports to stdout (streams live, safe on Ctrl+C)
   sudo masscan -iL "$tfile" -p1-65535 -e "$IFACE" \
-    --rate 1000 --wait 10 -oL "${dir}/masscan.txt" 2>&1 | tee "${dir}/stdout.txt" || true
+    --rate 1000 --wait 3 2>&1 \
+    | tee "${dir}/masscan.txt" || true
   rm -f "$tfile"
   end_run "$LABEL" "masscan"
   echo
