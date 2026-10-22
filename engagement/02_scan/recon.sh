@@ -70,13 +70,18 @@ do_masscan() {
 do_ports() {
   require_scope "$@"
   for ip in "$@"; do
+    # Quick ping pre-check — skip hosts that are down immediately
+    if ! ping -c 1 -W 2 "$ip" >/dev/null 2>&1; then
+      echo "[skip] $ip — host down (no ping reply), skipping port scan"
+      continue
+    fi
     banner "STEP 3  Port scan: $ip"
     local dir; dir=$(new_run "$LABEL" "$ip")
-    save_cmd "$dir" "sudo nmap -sS -sV -p- $T $ip -oA ${dir}/tcp  &&  sudo nmap -sU --top-ports 50 $T $ip -oA ${dir}/udp"
-    echo "[*] TCP full-port + service/version"
-    sudo nmap -sS -sV -p- $T "$ip" -oA "${dir}/tcp" | tee "${dir}/stdout.txt"
+    save_cmd "$dir" "sudo nmap -sS -sV -p- $T --host-timeout 5m --max-retries 1 $ip -oA ${dir}/tcp  &&  sudo nmap -sU --top-ports 50 $T $ip -oA ${dir}/udp"
+    echo "[*] TCP full-port + service/version (host-timeout 5m)"
+    sudo nmap -sS -sV -p- $T --host-timeout 5m --max-retries 1 "$ip" -oA "${dir}/tcp" | tee "${dir}/stdout.txt"
     echo "[*] UDP top-50"
-    sudo nmap -sU --top-ports 50 $T "$ip" -oA "${dir}/udp" | tee -a "${dir}/stdout.txt"
+    sudo nmap -sU --top-ports 50 $T --host-timeout 2m "$ip" -oA "${dir}/udp" | tee -a "${dir}/stdout.txt"
     end_run "$LABEL" "$ip"; echo ">> evidence: $dir"
   done
 }
